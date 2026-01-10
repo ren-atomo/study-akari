@@ -2337,6 +2337,10 @@
       <span class="tab-icon">📚</span>
       <span class="tab-label">学習分析</span>
     </button>
+    <button class="tab-btn" data-tab="redbook" onclick="switchTab('redbook')">
+      <span class="tab-icon">📕</span>
+      <span class="tab-label">過去問分析</span>
+    </button>
   </nav>
 
   <!-- Main -->
@@ -2346,6 +2350,15 @@
     
     <!-- 応援バナー -->
     <div id="cheerBanner" style="display: none;"></div>
+    
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-countdown">
+        <span class="hero-days" id="mainCountdown">--</span>
+        <span class="hero-unit">日</span>
+      </div>
+      <p class="hero-label">共通テストまで</p>
+    </section>
 
     <!-- Stats - Redesigned -->
     <section class="stats-row">
@@ -2357,6 +2370,10 @@
           <button class="stat-action-btn" onclick="openStudyModal()">
             <span class="stat-action-icon">📖</span>
             <span>学習を記録</span>
+          </button>
+          <button class="stat-action-btn secondary" onclick="openRedbookModal()">
+            <span class="stat-action-icon">📕</span>
+            <span>赤本を記録</span>
           </button>
         </div>
       </div>
@@ -2434,10 +2451,18 @@
     </section>
 
     <!-- Records -->
-    <section class="card">
-      <h3 class="card-title"><span class="card-title-icon">📖</span> 最近の学習記録</h3>
-      <div class="records-list" id="studyRecordsList">
-        <div class="empty-state">まだ記録がありません</div>
+    <section class="grid-2">
+      <div class="card">
+        <h3 class="card-title"><span class="card-title-icon">📖</span> 最近の学習記録</h3>
+        <div class="records-list" id="studyRecordsList">
+          <div class="empty-state">まだ記録がありません</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-title"><span class="card-title-icon">📕</span> 赤本演習履歴</h3>
+        <div class="records-list" id="redbookRecordsList">
+          <div class="empty-state">まだ記録がありません</div>
+        </div>
       </div>
     </section>
     </div><!-- End Dashboard Tab -->
@@ -2544,6 +2569,107 @@
         </div>
       </section>
     </div><!-- End Study Tab -->
+
+    <!-- ==================== Redbook Analysis Tab ==================== -->
+    <div class="tab-content" id="tab-redbook">
+      <section class="analysis-header">
+        <h2 class="analysis-title">📕 過去問分析</h2>
+        <p class="analysis-subtitle">赤本・模試の演習データ分析</p>
+      </section>
+
+      <!-- Redbook Stats -->
+      <section class="stats-row four-cols">
+        <div class="stat-item">
+          <div class="stat-value" id="redbookTotalCount">0</div>
+          <div class="stat-label">演習回数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="redbookAvgScore">0%</div>
+          <div class="stat-label">平均得点率</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="redbookHighScore">0%</div>
+          <div class="stat-label">最高得点</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="redbookTrend">―</div>
+          <div class="stat-label">傾向</div>
+        </div>
+      </section>
+
+      <!-- Score Trend Chart -->
+      <section class="card">
+        <h3 class="card-title">得点率推移</h3>
+        <div class="filter-row">
+          <select class="form-input form-select filter-select" id="scoreTrendSubject" onchange="updateScoreTrendChart()">
+            <option value="">全科目</option>
+          </select>
+        </div>
+        <div class="chart-container">
+          <canvas id="scoreTrendChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Subject Scores -->
+      <section class="card">
+        <h3 class="card-title">科目別平均得点率</h3>
+        <div id="subjectScores" class="breakdown-list">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- University Scores -->
+      <section class="card">
+        <h3 class="card-title">大学別平均得点率</h3>
+        <div id="universityScores" class="breakdown-list">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- Weak Areas -->
+      <section class="card">
+        <h3 class="card-title">⚠️ 頻出の苦手分野</h3>
+        <div id="weakAreasList" class="weak-areas-list">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- Growth Progress by University -->
+      <section class="card">
+        <h3 class="card-title"><span class="card-title-icon">📈</span> 成長グラフ</h3>
+        <div class="filter-row">
+          <select class="form-input form-select filter-select" id="growthUnivSelect" onchange="updateGrowthSubjects(); renderGrowthChart()">
+            <option value="">大学を選択</option>
+          </select>
+          <select class="form-input form-select filter-select" id="growthSubjectSelect" onchange="renderGrowthChart()">
+            <option value="">科目を選択</option>
+          </select>
+        </div>
+        <div class="growth-chart-container" id="growthChartContainer" style="display: none;">
+          <canvas id="growthChart"></canvas>
+          <div class="growth-summary" id="growthSummary"></div>
+        </div>
+        <div class="growth-empty" id="growthEmpty">
+          <p>大学と科目を選択すると、得点の推移が表示されます</p>
+        </div>
+      </section>
+
+      <!-- All Redbook Records -->
+      <section class="card">
+        <h3 class="card-title">全演習記録</h3>
+        <div class="filter-row">
+          <select class="form-input form-select filter-select" id="redbookFilterSubject" onchange="filterRedbookRecords()">
+            <option value="">全科目</option>
+          </select>
+          <select class="form-input form-select filter-select" id="redbookFilterUniv" onchange="filterRedbookRecords()">
+            <option value="">全大学</option>
+          </select>
+        </div>
+        <div class="records-list full-height" id="allRedbookRecords">
+          <div class="empty-state">まだ記録がありません</div>
+        </div>
+      </section>
+    </div><!-- End Redbook Tab -->
   </main>
 
   <!-- Study Log Modal -->
@@ -2561,12 +2687,17 @@
         <div class="form-group">
           <label class="form-label required">科目</label>
           <div class="btn-group" id="subjectButtons">
-            <button class="btn-option" data-value="国語">国語</button>
-            <button class="btn-option" data-value="数学">数学</button>
-            <button class="btn-option" data-value="情報">情報</button>
-            <button class="btn-option" data-value="英語">英語</button>
-            <button class="btn-option" data-value="ストレイル">ストレイル</button>
-            <button class="btn-option" data-value="課題">課題</button>
+            <button class="btn-option" data-value="現代文">現代文</button>
+            <button class="btn-option" data-value="古文">古文</button>
+            <button class="btn-option" data-value="漢文">漢文</button>
+            <button class="btn-option" data-value="数学1A">数学1A</button>
+            <button class="btn-option" data-value="数学2B">数学2B</button>
+            <button class="btn-option" data-value="単語">単語</button>
+            <button class="btn-option" data-value="文法">文法</button>
+            <button class="btn-option" data-value="長文">長文</button>
+            <button class="btn-option" data-value="音読">音読</button>
+            <button class="btn-option" data-value="リスニング">リスニング</button>
+            <button class="btn-option" data-value="その他">その他</button>
           </div>
         </div>
         <div class="form-group">
@@ -2619,6 +2750,165 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeStudyModal()">キャンセル</button>
         <button class="btn btn-primary" onclick="submitStudyLog()">記録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Redbook Modal -->
+  <div class="modal-overlay" id="redbookModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">赤本記録を追加</h2>
+        <button class="modal-close" onclick="closeRedbookModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label required">日付</label>
+          <input type="date" class="form-input" id="redbookDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label required">大学名</label>
+          <select class="form-input form-select" id="redbookUniversity" onchange="toggleCustomUniversity(); showPreviousRedbookRecord()">
+            <option value="">選択してください</option>
+            <option value="立教大学">立教大学</option>
+            <option value="青山学院大学">青山学院大学</option>
+            <option value="法政大学">法政大学</option>
+            <option value="中央大学">中央大学</option>
+            <option value="明治学院大学">明治学院大学</option>
+            <option value="成城大学">成城大学</option>
+            <option value="東洋大学">東洋大学</option>
+            <option value="駒澤大学">駒澤大学</option>
+            <option value="日本大学">日本大学</option>
+            <option value="専修大学">専修大学</option>
+            <option value="共通テスト">共通テスト</option>
+            <option value="__custom__">その他（入力する）</option>
+          </select>
+          <div class="custom-input-wrapper" id="customUniversityWrapper">
+            <input type="text" class="form-input" id="customUniversity" placeholder="大学名を入力">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">科目</label>
+          <select class="form-input form-select" id="redbookSubject" onchange="showPreviousRedbookRecord()">
+            <option value="">選択してください</option>
+            <optgroup label="英語">
+              <option value="英語R">英語R（リーディング）</option>
+              <option value="英語L">英語L（リスニング）</option>
+              <option value="英語">英語（総合）</option>
+            </optgroup>
+            <optgroup label="国語">
+              <option value="現代文">現代文</option>
+              <option value="古文">古文</option>
+              <option value="漢文">漢文</option>
+              <option value="国語">国語（総合）</option>
+            </optgroup>
+            <optgroup label="数学">
+              <option value="数学IA">数学IA</option>
+              <option value="数学IIB">数学IIB</option>
+              <option value="数学IIIC">数学IIIC</option>
+              <option value="数学">数学（総合）</option>
+            </optgroup>
+          </select>
+          <!-- 前回の記録表示エリア -->
+          <div class="previous-record-hint" id="previousRedbookRecord" style="display: none;">
+            <div class="previous-record-header">
+              <span class="previous-record-icon">💡</span>
+              <span class="previous-record-title">前回の記録</span>
+            </div>
+            <div class="previous-record-content" id="previousRedbookContent"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">年度</label>
+          <select class="form-input form-select" id="redbookYear">
+            <option value="">選択してください</option>
+            <option value="2025">2025年</option>
+            <option value="2024">2024年</option>
+            <option value="2023">2023年</option>
+            <option value="2022">2022年</option>
+            <option value="2021">2021年</option>
+            <option value="2020">2020年</option>
+            <option value="2019">2019年</option>
+            <option value="2018">2018年</option>
+            <option value="2017">2017年</option>
+            <option value="2016">2016年</option>
+            <option value="2015">2015年</option>
+            <option value="2014以前">2014年以前</option>
+            <option value="オリジナル">オリジナル問題</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">得点</label>
+          <div class="score-input-container">
+            <div class="score-row score-total">
+              <span class="score-label">総合</span>
+              <div class="score-inputs">
+                <input type="number" class="form-input score-box" id="totalScoreGot" readonly placeholder="0">
+                <span class="score-divider">/</span>
+                <input type="number" class="form-input score-box" id="totalScoreMax" readonly placeholder="0">
+                <span class="score-percent" id="totalScorePercent">（0%）</span>
+              </div>
+            </div>
+            <div id="sectionScoresContainer">
+              <div class="score-row" data-section="1">
+                <input type="text" class="form-input section-name" value="大問1" placeholder="大問1">
+                <div class="score-inputs">
+                  <input type="number" class="form-input score-box section-got" min="0" placeholder="0" oninput="calculateTotalScore()">
+                  <span class="score-divider">/</span>
+                  <input type="number" class="form-input score-box section-max" min="0" placeholder="0" oninput="calculateTotalScore()">
+                </div>
+              </div>
+              <div class="score-row" data-section="2">
+                <input type="text" class="form-input section-name" value="大問2" placeholder="大問2">
+                <div class="score-inputs">
+                  <input type="number" class="form-input score-box section-got" min="0" placeholder="0" oninput="calculateTotalScore()">
+                  <span class="score-divider">/</span>
+                  <input type="number" class="form-input score-box section-max" min="0" placeholder="0" oninput="calculateTotalScore()">
+                </div>
+              </div>
+            </div>
+            <div class="score-buttons">
+              <button type="button" class="btn btn-sm btn-outline" onclick="removeSection()">−</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="addSection()">＋</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">⏱️ 解答時間（分）</label>
+          <div class="time-input-toggle">
+            <button type="button" class="time-toggle-btn active" onclick="toggleTimeInputMode('total')">総合のみ</button>
+            <button type="button" class="time-toggle-btn" onclick="toggleTimeInputMode('section')">大問ごと</button>
+          </div>
+          <div id="totalTimeInput">
+            <input type="number" class="form-input" id="redbookTime" min="0" placeholder="例: 80">
+          </div>
+          <div id="sectionTimeInput" style="display: none;">
+            <div class="score-input-container" style="padding: 0.75rem;">
+              <div class="score-row" style="margin-bottom: 0.5rem;">
+                <span class="score-label" style="font-weight: 600;">総合</span>
+                <div class="score-inputs">
+                  <input type="number" class="form-input score-box" id="totalTimeCalc" readonly placeholder="0">
+                  <span style="color: var(--gray-500); font-size: 0.875rem;">分（自動計算）</span>
+                </div>
+              </div>
+              <div id="sectionTimesContainer">
+                <!-- Generated by JS based on score sections -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">📋 間違えた分野（任意）</label>
+          <input type="text" class="form-input" id="redbookWeakAreas" placeholder="例: 関係詞、長文読解、確率">
+        </div>
+        <div class="form-group">
+          <label class="form-label">メモ（任意）</label>
+          <textarea class="form-input form-textarea" id="redbookMemo" placeholder="反省点や次回の課題など"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeRedbookModal()">キャンセル</button>
+        <button class="btn btn-primary" onclick="submitRedbookLog()">記録する</button>
       </div>
     </div>
   </div>
@@ -3323,6 +3613,7 @@
     
     function renderStats() {
       const logs = appData.studyLogs || [];
+      const redbookLogs = appData.redbookLogs || [];
       const today = getTodayStr();
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
@@ -3330,9 +3621,16 @@
       monthAgo.setDate(monthAgo.getDate() - 30);
       
       // 学習記録の時間
-      const todayMinutes = logs
+      const studyTodayMinutes = logs
         .filter(log => log.date === today)
         .reduce((sum, log) => sum + (log.minutes || 0), 0);
+      
+      // 赤本記録の時間
+      const redbookTodayMinutes = redbookLogs
+        .filter(log => log.date === today)
+        .reduce((sum, log) => sum + (log.time || 0), 0);
+      
+      const todayMinutes = studyTodayMinutes + redbookTodayMinutes;
       
       // 今日の学習時間を時間/分で表示
       if (todayMinutes >= 60) {
@@ -3359,45 +3657,59 @@
       }
       
       // 週間の学習時間
-      const weekMinutes = logs
+      const studyWeekMinutes = logs
         .filter(log => new Date(log.date) >= weekAgo)
         .reduce((sum, log) => sum + (log.minutes || 0), 0);
       
+      const redbookWeekMinutes = redbookLogs
+        .filter(log => new Date(log.date) >= weekAgo)
+        .reduce((sum, log) => sum + (log.time || 0), 0);
+      
+      const weekMinutes = studyWeekMinutes + redbookWeekMinutes;
       const weekHours = Math.round(weekMinutes / 60);
       document.getElementById('weekMinutes').textContent = weekHours + 'h';
       
-      // 連続日数
-      const allDates = logs.map(log => log.date);
+      // 連続日数（学習記録と赤本記録の両方を考慮）
+      const allDates = [
+        ...logs.map(log => log.date),
+        ...redbookLogs.map(log => log.date)
+      ];
       const streakDays = calculateStreak({ dates: allDates });
       document.getElementById('streakDays').textContent = streakDays;
       
-      // 学習回数
+      // 学習回数（学習記録 + 赤本記録）
       const monthStudySessions = logs.filter(log => new Date(log.date) >= monthAgo).length;
-      document.getElementById('totalSessions').textContent = monthStudySessions;
+      const monthRedbookSessions = redbookLogs.filter(log => new Date(log.date) >= monthAgo).length;
+      document.getElementById('totalSessions').textContent = monthStudySessions + monthRedbookSessions;
       
       // C: 累計学習時間
-      const totalMinutes = logs.reduce((sum, log) => sum + (log.minutes || 0), 0);
+      const totalStudyMinutes = logs.reduce((sum, log) => sum + (log.minutes || 0), 0);
+      const totalRedbookMinutes = redbookLogs.reduce((sum, log) => sum + (log.time || 0), 0);
+      const totalMinutes = totalStudyMinutes + totalRedbookMinutes;
       const totalHours = Math.round(totalMinutes / 60);
       document.getElementById('totalHours').textContent = totalHours + 'h';
       
       // C: 平均学習時間（学習日のみ）
-      const allDatesSet = new Set(logs.map(log => log.date));
+      const allDatesSet = new Set([
+        ...logs.map(log => log.date),
+        ...redbookLogs.map(log => log.date)
+      ]);
       const studyDays = allDatesSet.size || 1;
       const avgMinutes = Math.round(totalMinutes / studyDays);
       document.getElementById('avgMinutes').textContent = avgMinutes + '分';
       
       // A: 週間カレンダーを描画
-      renderWeekCalendar(logs);
+      renderWeekCalendar(logs, redbookLogs);
       
       // B: 日別チャートを描画
-      renderDashDailyChart(logs);
+      renderDashDailyChart(logs, redbookLogs);
       
       // おすすめを表示
       renderInsights();
     }
     
     // A: 週間カレンダー描画
-    function renderWeekCalendar(logs) {
+    function renderWeekCalendar(logs, redbookLogs) {
       const container = document.getElementById('weekCalendar');
       if (!container) return;
       
@@ -3416,7 +3728,9 @@
         const isToday = dateStr === getTodayStr();
         
         // その日の学習時間を計算
-        const totalMins = logs.filter(l => l.date === dateStr).reduce((sum, l) => sum + (l.minutes || 0), 0);
+        const studyMins = logs.filter(l => l.date === dateStr).reduce((sum, l) => sum + (l.minutes || 0), 0);
+        const redbookMins = redbookLogs.filter(l => l.date === dateStr).reduce((sum, l) => sum + (l.time || 0), 0);
+        const totalMins = studyMins + redbookMins;
         const studied = totalMins > 0;
         
         html += `
@@ -3436,7 +3750,7 @@
     // B: ダッシュボード日別チャート
     let dashDailyChartInstance = null;
     
-    function renderDashDailyChart(logs) {
+    function renderDashDailyChart(logs, redbookLogs) {
       const canvas = document.getElementById('dashDailyChart');
       if (!canvas) return;
       
@@ -3454,10 +3768,11 @@
         date.setDate(startOfWeek.getDate() + i);
         const dateStr = date.toISOString().split('T')[0];
         
-        const totalMins = logs.filter(l => l.date === dateStr).reduce((sum, l) => sum + (l.minutes || 0), 0);
+        const studyMins = logs.filter(l => l.date === dateStr).reduce((sum, l) => sum + (l.minutes || 0), 0);
+        const redbookMins = redbookLogs.filter(l => l.date === dateStr).reduce((sum, l) => sum + (l.time || 0), 0);
         
         labels.push(dayLabels[i]);
-        data.push(totalMins);
+        data.push(studyMins + redbookMins);
       }
       
       if (dashDailyChartInstance) {
@@ -3524,9 +3839,10 @@
       const insightsListStudy = document.getElementById('insightsListStudy');
       
       const studyLogs = appData.studyLogs || [];
+      const redbookLogs = appData.redbookLogs || [];
       
-      const insights = generateInsights(studyLogs);
-      const recommendations = generateRecommendations(studyLogs);
+      const insights = generateInsights(studyLogs, redbookLogs);
+      const recommendations = generateRecommendations(studyLogs, redbookLogs);
       
       // ダッシュボード: おすすめ表示
       if (recommendations.length > 0) {
@@ -3559,7 +3875,7 @@
       }
     }
     
-    function generateInsights(studyLogs) {
+    function generateInsights(studyLogs, redbookLogs) {
       const insights = [];
       const today = new Date();
       const weekAgo = new Date(today);
@@ -3707,7 +4023,7 @@
       return insights;
     }
     
-    function generateRecommendations(studyLogs) {
+    function generateRecommendations(studyLogs, redbookLogs) {
       const recommendations = [];
       const today = new Date();
       const todayStr = getTodayStr();
@@ -3731,7 +4047,7 @@
       allSubjects
         .filter(subj => !todaySubjects.has(subj))
         .sort((a, b) => (subjectLastDate[a] || '') < (subjectLastDate[b] || '') ? -1 : 1)
-        .slice(0, 3)
+        .slice(0, 2)
         .forEach(subj => {
           const lastDate = subjectLastDate[subj];
           const daysSince = lastDate ? Math.floor((today - new Date(lastDate)) / (1000 * 60 * 60 * 24)) : 999;
@@ -3741,6 +4057,31 @@
               text: subj,
               reason: `${daysSince}日間やっていません`,
               action: `openStudyModal()`
+            });
+          }
+        });
+      
+      // 2. 久しぶりの過去問をおすすめ
+      const redbookLastDate = {};
+      redbookLogs.forEach(l => {
+        const key = `${l.university}|${l.subject}`;
+        if (!redbookLastDate[key] || l.date > redbookLastDate[key].date) {
+          redbookLastDate[key] = l;
+        }
+      });
+      
+      Object.entries(redbookLastDate)
+        .sort((a, b) => (a[1].date || '') < (b[1].date || '') ? -1 : 1)
+        .slice(0, 2)
+        .forEach(([key, lastLog]) => {
+          const daysSince = Math.floor((today - new Date(lastLog.date)) / (1000 * 60 * 60 * 24));
+          if (daysSince >= 7) {
+            const [univ, subj] = key.split('|');
+            recommendations.push({
+              icon: '📕',
+              text: `${univ} ${subj}`,
+              reason: `前回から${daysSince}日経過`,
+              action: `openRedbookModal()`
             });
           }
         });
