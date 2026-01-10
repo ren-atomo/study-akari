@@ -541,10 +541,8 @@
 
     .goal-fill.kokugo { background: #EBCB8B; }
     .goal-fill.sugaku { background: #A3BE8C; }
-    .goal-fill.eigo { background: #5E81AC; }
     .goal-fill.joho { background: #B48EAD; }
-    .goal-fill.strail { background: #88C0D0; }
-    .goal-fill.kadai { background: #D08770; }
+    .goal-fill.eigo { background: #5E81AC; }
 
     /* Records - Card Style */
     .records-list {
@@ -2040,8 +2038,6 @@
             <button class="btn-option" data-value="数学">数学</button>
             <button class="btn-option" data-value="情報">情報</button>
             <button class="btn-option" data-value="英語">英語</button>
-            <button class="btn-option" data-value="ストレイル">ストレイル</button>
-            <button class="btn-option" data-value="課題">課題</button>
           </div>
         </div>
         <div class="form-group">
@@ -2051,6 +2047,8 @@
             <button class="btn-option" data-value="復習">復習</button>
             <button class="btn-option" data-value="演習">演習</button>
             <button class="btn-option" data-value="暗記">暗記</button>
+            <button class="btn-option" data-value="ストレイル">ストレイル</button>
+            <button class="btn-option" data-value="課題">課題</button>
           </div>
         </div>
         <div class="form-group">
@@ -2190,7 +2188,7 @@
     // ==========================================
     // バージョン管理 & キャッシュクリア
     // ==========================================
-    const APP_VERSION = '2.1.0';
+    const APP_VERSION = '2.1.1';
     const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbygSI6dft0E2d_D0isU4lAlWuuQgWRMlizHOdMTDqt8w1Igpud6nvpvN1Gy1t2AyLGpBw/exec';
     const DEFAULT_CHAT_URL = 'https://script.google.com/macros/s/AKfycbxppU_VWeV9IwVl-5tY7o0vuMCqRURoH0fltq_mo7JSegCv5VI-X1QjG7khcATLlj7vGQ/exec';
     
@@ -2993,14 +2991,12 @@
         });
       }
       
-      // 科目別カラー（新しい科目に対応）
+      // 科目別カラー
       const colors = {
         '国語': '#EBCB8B',
         '数学': '#A3BE8C',
         '情報': '#B48EAD',
         '英語': '#5E81AC',
-        'ストレイル': '#88C0D0',
-        '課題': '#D08770',
         'その他': '#4C566A'
       };
       
@@ -3079,8 +3075,6 @@
         '数学': '#A3BE8C',
         '情報': '#B48EAD',
         '英語': '#5E81AC',
-        'ストレイル': '#88C0D0',
-        '課題': '#D08770',
         'その他': '#4C566A'
       };
       
@@ -3136,7 +3130,7 @@
         return;
       }
       
-      const classes = { '国語': 'kokugo', '数学': 'sugaku', '情報': 'joho', '英語': 'eigo', 'ストレイル': 'strail', '課題': 'kadai' };
+      const classes = { '国語': 'kokugo', '数学': 'sugaku', '情報': 'joho', '英語': 'eigo' };
       
       section.innerHTML = goals.map(goal => {
         const progress = Math.min(100, Math.round(((goal.current) / (goal.target)) * 100));
@@ -3757,8 +3751,6 @@
         '数学': '#A3BE8C',
         '情報': '#B48EAD',
         '英語': '#5E81AC',
-        'ストレイル': '#88C0D0',
-        '課題': '#D08770',
         'その他': '#4C566A'
       };
       
