@@ -146,10 +146,10 @@
     }
 
     .hero-title {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      line-height: 1.2;
+      line-height: 1.3;
       color: var(--black);
       margin-bottom: 0.5rem;
     }
@@ -1808,8 +1808,8 @@
     
     <!-- Hero -->
     <section class="hero">
-      <h1 class="hero-title">継続は力なり</h1>
-      <p class="hero-subtitle">毎日コツコツ学習を記録しよう</p>
+      <h1 class="hero-title" id="heroTitle">継続は力なり</h1>
+      <p class="hero-subtitle" id="heroSubtitle">毎日コツコツ学習を記録しよう</p>
     </section>
 
     <!-- Stats - Redesigned -->
@@ -2188,7 +2188,7 @@
     // ==========================================
     // バージョン管理 & キャッシュクリア
     // ==========================================
-    const APP_VERSION = '2.1.1';
+    const APP_VERSION = '2.2.0';
     const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbygSI6dft0E2d_D0isU4lAlWuuQgWRMlizHOdMTDqt8w1Igpud6nvpvN1Gy1t2AyLGpBw/exec';
     const DEFAULT_CHAT_URL = 'https://script.google.com/macros/s/AKfycbxppU_VWeV9IwVl-5tY7o0vuMCqRURoH0fltq_mo7JSegCv5VI-X1QjG7khcATLlj7vGQ/exec';
     
@@ -2228,6 +2228,71 @@
     })();
     
     // ==========================================
+    // 名言リスト
+    // ==========================================
+    const quotes = [
+      { text: '学べば学ぶほど、自分が何も知らなかったことに気づく', author: 'ソクラテス' },
+      { text: '教育は、世界を変えるために使える最も強力な武器である', author: 'ネルソン・マンデラ' },
+      { text: '未来は、今日何をするかにかかっている', author: 'マハトマ・ガンディー' },
+      { text: '学ぶことをやめたら、教えることをやめなければならない', author: 'ロジェ・マルタン・デュ・ガール' },
+      { text: '知識への投資は、常に最高の利子を生む', author: 'ベンジャミン・フランクリン' },
+      { text: '学ぶのに遅すぎるということはない', author: 'プラトン' },
+      { text: '教育は、暗闇の中の光である', author: 'マララ・ユスフザイ' },
+      { text: '天才とは、1%のひらめきと99%の努力である', author: 'トーマス・エジソン' },
+      { text: '私たちの最大の弱点は諦めることにある', author: 'トーマス・エジソン' },
+      { text: '人は習慣によって作られる。優れた結果は一時的な行動ではなく、習慣から生まれる', author: 'アリストテレス' },
+      { text: '今日できることを明日に延ばすな', author: 'ベンジャミン・フランクリン' },
+      { text: '成功は日々の小さな努力の積み重ねである', author: 'ロバート・コリアー' },
+      { text: '変化することを学ばなければ、生き残ることはできない', author: 'ダーウィン' },
+      { text: '知識は力なり', author: 'フランシス・ベーコン' },
+      { text: '読書は完全な人間を作り、会議は機敏な人間を作り、書くことは正確な人間を作る', author: 'フランシス・ベーコン' },
+      { text: '学問なき経験は、経験なき学問に勝る', author: 'ベンジャミン・フランクリン' },
+      { text: '成功の秘訣は、始めることである', author: 'マーク・トウェイン' },
+      { text: '千里の道も一歩から', author: '老子' },
+      { text: '学びて思わざれば則ち罔し、思いて学ばざれば則ち殆し', author: '孔子' },
+      { text: '知識だけでは不十分である。それを応用しなければならない', author: 'ゲーテ' }
+    ];
+    
+    function updateHeroMessage() {
+      const titleEl = document.getElementById('heroTitle');
+      const subtitleEl = document.getElementById('heroSubtitle');
+      
+      // 最後に記録した時刻をチェック
+      const lastRecordTime = localStorage.getItem('lastRecordTime');
+      const now = Date.now();
+      
+      // 5分以内に記録していたら褒めメッセージ
+      if (lastRecordTime && (now - parseInt(lastRecordTime)) < 5 * 60 * 1000) {
+        titleEl.textContent = 'よく頑張ったね！えらい！';
+        subtitleEl.textContent = '今日の学習を記録しました';
+        titleEl.style.background = 'linear-gradient(135deg, #A3BE8C 0%, #8FBCBB 100%)';
+        titleEl.style.webkitBackgroundClip = 'text';
+        titleEl.style.webkitTextFillColor = 'transparent';
+        titleEl.style.backgroundClip = 'text';
+        
+        // 10秒後に名言に戻す
+        setTimeout(() => {
+          showRandomQuote();
+        }, 10000);
+      } else {
+        showRandomQuote();
+      }
+    }
+    
+    function showRandomQuote() {
+      const titleEl = document.getElementById('heroTitle');
+      const subtitleEl = document.getElementById('heroSubtitle');
+      
+      const quote = quotes[Math.floor(Math.random() * quotes.length)];
+      titleEl.textContent = quote.text;
+      subtitleEl.textContent = '― ' + quote.author;
+      titleEl.style.background = '';
+      titleEl.style.webkitBackgroundClip = '';
+      titleEl.style.webkitTextFillColor = '';
+      titleEl.style.backgroundClip = '';
+    }
+    
+    // ==========================================
     // メイン
     // ==========================================
     let API_URL = localStorage.getItem('apiUrl') || DEFAULT_API_URL;
@@ -2254,6 +2319,7 @@
       initializeDateInputs();
       initializeButtonGroups();
       loadSettingsFromStorage();
+      updateHeroMessage(); // ヒーローメッセージを更新
       initChat(); // チャット初期化
       
       if (API_URL) {
@@ -2443,6 +2509,7 @@
     }
     
     function renderDashboard() {
+      updateHeroMessage();
       renderCheerBanner();
       renderStats();
       renderProgress();
@@ -3325,6 +3392,9 @@
           textbook: document.getElementById('studyTextbook').value,
           memo: document.getElementById('studyMemo').value
         });
+        
+        // 記録時刻を保存
+        localStorage.setItem('lastRecordTime', Date.now().toString());
         
         closeStudyModal();
         showToast('学習記録を保存しました');
